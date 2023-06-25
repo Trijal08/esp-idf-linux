@@ -11,6 +11,8 @@
 #include "esp_system.h"
 #include "spi_flash_mmap.h"
 #include "esp_partition.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 
 static const void * IRAM_ATTR map_partition(const char *name)
 {
@@ -39,8 +41,15 @@ static void IRAM_ATTR map_flash_and_go(void)
 	asm volatile ("jx %0" :: "r"(ptr0));
 }
 
+static void linux_task(void *p)
+{
+	map_flash_and_go();
+	esp_restart();
+}
+
 void app_main(void)
 {
-    map_flash_and_go();
-    esp_restart();
+	xTaskCreatePinnedToCore(linux_task, "linux_task", 4096, NULL, 5, NULL,
+				CONFIG_LINUX_CORE);
+	vTaskSuspend(NULL);
 }
