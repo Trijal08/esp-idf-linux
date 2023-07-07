@@ -4660,6 +4660,9 @@ static void prvCheckTasksWaitingTermination( void )
             pxTaskStatus->xTaskNumber = pxTCB->uxTCBNumber;
             #if ( configTASKLIST_INCLUDE_COREID == 1 )
             {
+				if (xCoreID == tskNO_AFFINITY)
+					xCoreID = 0;
+				
                 #if ( configNUMBER_OF_CORES > 1 )
                 {
                     pxTaskStatus->xCoreID = pxTCB->xCoreID;
