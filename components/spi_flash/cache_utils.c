@@ -119,6 +119,8 @@ void IRAM_ATTR spi_flash_op_block_func(void *arg)
 #endif // #if ( ( CONFIG_FREERTOS_SMP ) && ( !CONFIG_FREERTOS_UNICORE ) )
 }
 
+int g_spi_flash_skip_ipc;
+
 void IRAM_ATTR spi_flash_disable_interrupts_caches_and_other_cpu(void)
 {
 #if CONFIG_FREERTOS_TASK_CREATE_ALLOW_EXT_MEM
@@ -143,6 +145,7 @@ void IRAM_ATTR spi_flash_disable_interrupts_caches_and_other_cpu(void)
         // esp_intr_noniram_disable.
         assert(other_cpuid == 1);
     } else {
+      if (!g_spi_flash_skip_ipc) {
         bool ipc_call_was_send_to_other_cpu;
         do {
 #if ( ( CONFIG_FREERTOS_SMP ) && ( !CONFIG_FREERTOS_UNICORE ) )
@@ -176,6 +179,7 @@ void IRAM_ATTR spi_flash_disable_interrupts_caches_and_other_cpu(void)
             // Busy loop and wait for spi_flash_op_block_func to disable cache
             // on the other CPU
         }
+	  }
     }
 
     // Kill interrupts that aren't located in IRAM
