@@ -1,0 +1,2 @@
+# Intentionally empty: IDF only picks up sdkconfig.defaults.<target>
+# when a base sdkconfig.defaults exists (tools/cmake/kconfig.cmake).
